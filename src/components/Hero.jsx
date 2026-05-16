@@ -121,7 +121,7 @@ export default function Hero() {
             <div className="flex items-center justify-center gap-3">
               <span className="h-px w-10 bg-orange/40" />
               <p className="text-[11px] tracking-[0.28em] uppercase text-orange font-semibold">
-                From the Global Perspectives book series
+                Think Global 2025 — A part of the Global Perspectives book series
               </p>
               <span className="h-px w-10 bg-orange/40" />
             </div>
