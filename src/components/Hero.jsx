@@ -112,40 +112,12 @@ export default function Hero() {
           — eight global voices, one focused afternoon in Tokyo.
         </p>
 
-        {/* Contributors marquee — between subhead and book showcase */}
-        {(() => {
-          const all = [
-            ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
-            ...ROLES.forewords.map((c) => ({ ...c, role: "Foreword" })),
-            ...ROLES.chapters.map((c) => ({ ...c, role: "Contributor" })),
-            ...ROLES.eventOnly.map((c) => ({ ...c, role: "Speaker" })),
-          ];
-          const minLoop = Math.max(all.length * 2, 24);
-          const loop = [];
-          while (loop.length < minLoop) loop.push(...all);
-
-          return (
-            <div
-              className="mt-10 md:mt-14 reveal"
-              style={{ animationDelay: "250ms" }}
-            >
-              <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
-                <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4">
-                  {loop.map((c, i) => (
-                    <ContribCard key={`${c.name}-${i}`} c={c} size={72} showRole />
-                  ))}
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* From the Global Perspectives book series — header + tilted overlapping books */}
+        {/* From the Global Perspectives book series — header + marquee + books in one tight block */}
         <div
-          className="mt-12 md:mt-16 reveal"
-          style={{ animationDelay: "350ms" }}
+          className="mt-10 md:mt-14 reveal"
+          style={{ animationDelay: "250ms" }}
         >
-          <div className="text-center mb-6">
+          <div className="text-center mb-4">
             <div className="flex items-center justify-center gap-3">
               <span className="h-px w-10 bg-orange/40" />
               <p className="text-[11px] tracking-[0.28em] uppercase text-orange font-semibold">
@@ -153,7 +125,7 @@ export default function Hero() {
               </p>
               <span className="h-px w-10 bg-orange/40" />
             </div>
-            <p className="text-xs text-muted italic mt-3">
+            <p className="text-xs text-muted italic mt-2">
               {(() => {
                 const total =
                   ROLES.editors.length +
@@ -165,8 +137,30 @@ export default function Hero() {
             </p>
           </div>
 
-          {/* Tilted overlapping book pair */}
-          <div className="flex justify-center items-center">
+          {/* Contributors marquee */}
+          {(() => {
+            const all = [
+              ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
+              ...ROLES.forewords.map((c) => ({ ...c, role: "Foreword" })),
+              ...ROLES.chapters.map((c) => ({ ...c, role: "Contributor" })),
+              ...ROLES.eventOnly.map((c) => ({ ...c, role: "Speaker" })),
+            ];
+            const minLoop = Math.max(all.length * 2, 24);
+            const loop = [];
+            while (loop.length < minLoop) loop.push(...all);
+            return (
+              <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
+                <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4">
+                  {loop.map((c, i) => (
+                    <ContribCard key={`${c.name}-${i}`} c={c} size={72} showRole />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Tilted overlapping book pair — close to marquee */}
+          <div className="mt-5 md:mt-6 flex justify-center items-center">
             {publications.map((p, i) => {
               const isFirst = i === 0;
               return (
@@ -200,7 +194,7 @@ export default function Hero() {
           </div>
 
           {/* Book captions — below the tilted pair */}
-          <div className="mt-6 flex justify-center gap-10 md:gap-16 text-center">
+          <div className="mt-4 flex justify-center gap-10 md:gap-16 text-center">
             {publications.map((p) => (
               <a
                 key={p.title + "-cap"}
