@@ -118,7 +118,16 @@ export default function Hero() {
           style={{ animationDelay: "350ms" }}
         >
           {(() => {
+            const books = publications.map((p) => ({
+              name: p.title,
+              role: "Book",
+              type: "book",
+              img: p.img,
+              url: p.url,
+              meta: p.year,
+            }));
             const all = [
+              ...books,
               ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
               ...ROLES.forewords.map((c) => ({ ...c, role: "Foreword" })),
               ...ROLES.chapters.map((c) => ({ ...c, role: "Contributor" })),
@@ -127,7 +136,7 @@ export default function Hero() {
             return (
               <ContributorRow
                 label="The full lineup"
-                sub="Editors · Foreword Writers · Contributors · Speakers"
+                sub="2 books · Editors · Foreword Writers · Contributors · Speakers"
                 count={all.length}
                 items={all}
                 tier="primary"
@@ -249,6 +258,7 @@ function ContributorRow({ label, sub, count, items, tier = "marquee", showRole =
 }
 
 const ROLE_TAG_STYLES = {
+  Book: "bg-orange text-ink border-orange",
   Editor: "bg-orange/20 text-orange border-orange/40",
   Foreword: "bg-cream/15 text-cream border-cream/30",
   Contributor: "bg-white/10 text-muted border-white/15",
@@ -256,20 +266,22 @@ const ROLE_TAG_STYLES = {
 };
 
 function ContribCard({ c, size, showRole = false }) {
-  const src = photos[c.name];
-  const aff = affiliations[c.name];
-  const cleanName = c.name.replace(/^Prof\.\s+|^Dr\.\s+/, "");
+  const isBook = c.type === "book";
+  const src = isBook ? c.img : photos[c.name];
+  const aff = isBook ? c.meta : affiliations[c.name];
+  const cleanName = isBook ? c.name : c.name.replace(/^Prof\.\s+|^Dr\.\s+/, "");
   const roleTagClass = ROLE_TAG_STYLES[c.role] || "bg-white/10 text-muted border-white/15";
+  const cardW = isBook ? Math.round(size * 0.75) : size;
   return (
     <a
-      href="#publications"
+      href={isBook ? "#publications" : "#publications"}
       title={aff || c.name}
       className="group shrink-0 block"
-      style={{ width: size + 16 }}
+      style={{ width: (isBook ? cardW : size) + 16 }}
     >
       <div
         className="relative overflow-hidden rounded-lg border border-white/15 group-hover:border-orange/60 transition-colors bg-white/[0.04]"
-        style={{ width: size, height: size }}
+        style={{ width: isBook ? cardW : size, height: size }}
       >
         {src ? (
           <img
