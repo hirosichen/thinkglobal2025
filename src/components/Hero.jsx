@@ -112,22 +112,56 @@ export default function Hero() {
           — eight global voices, one focused afternoon in Tokyo.
         </p>
 
+        {/* From the book series — prominent two-book showcase */}
+        <div
+          className="mt-12 md:mt-16 reveal"
+          style={{ animationDelay: "250ms" }}
+        >
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <span className="h-px w-10 bg-orange/40" />
+            <p className="text-[11px] tracking-[0.28em] uppercase text-orange font-semibold">
+              From the Global Perspectives book series
+            </p>
+            <span className="h-px w-10 bg-orange/40" />
+          </div>
+          <div className="grid grid-cols-2 gap-5 md:gap-10 max-w-3xl mx-auto">
+            {publications.map((p) => (
+              <a
+                key={p.title}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col items-center text-center"
+              >
+                <div className="relative w-full aspect-[3/4] max-w-[200px] overflow-hidden rounded-lg border-2 border-white/15 group-hover:border-orange/60 transition-colors shadow-2xl shadow-black/40">
+                  <img
+                    src={p.img}
+                    alt={p.title}
+                    className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
+                  />
+                  <span className="absolute top-2 left-2 px-2 py-1 text-[9px] tracking-[0.18em] uppercase font-bold bg-orange text-ink rounded">
+                    {p.year}
+                  </span>
+                </div>
+                <div className="mt-4 font-display text-lg md:text-xl text-cream leading-tight">
+                  {p.title}
+                </div>
+                <div className="text-xs md:text-sm text-muted italic mt-1">{p.subtitle}</div>
+                <div className="text-[10px] tracking-[0.16em] uppercase text-orange/80 mt-2 group-hover:text-orange transition-colors">
+                  Palgrave Macmillan ↗
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
         {/* Contributors — single unified marquee with role tags */}
         <div
           className="mt-14 md:mt-20 reveal"
           style={{ animationDelay: "350ms" }}
         >
           {(() => {
-            const books = publications.map((p) => ({
-              name: p.title,
-              role: "Book",
-              type: "book",
-              img: p.img,
-              url: p.url,
-              meta: p.year,
-            }));
             const all = [
-              ...books,
               ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
               ...ROLES.forewords.map((c) => ({ ...c, role: "Foreword" })),
               ...ROLES.chapters.map((c) => ({ ...c, role: "Contributor" })),
@@ -136,7 +170,7 @@ export default function Hero() {
             return (
               <ContributorRow
                 label="The full lineup"
-                sub="2 books · Editors · Foreword Writers · Contributors · Speakers"
+                sub="Editors · Foreword Writers · Contributors · Speakers"
                 count={all.length}
                 items={all}
                 tier="primary"
