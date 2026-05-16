@@ -121,13 +121,13 @@ export default function Hero() {
             const all = [
               ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
               ...ROLES.forewords.map((c) => ({ ...c, role: "Foreword" })),
-              ...ROLES.chapters.map((c) => ({ ...c, role: "Chapter Author" })),
+              ...ROLES.chapters.map((c) => ({ ...c, role: "Contributor" })),
               ...ROLES.eventOnly.map((c) => ({ ...c, role: "Speaker" })),
             ];
             return (
               <ContributorRow
                 label="The full lineup"
-                sub="Editors · Foreword Writers · Chapter Authors · Speakers"
+                sub="Editors · Foreword Writers · Contributors · Speakers"
                 count={all.length}
                 items={all}
                 tier="primary"
@@ -251,7 +251,7 @@ function ContributorRow({ label, sub, count, items, tier = "marquee", showRole =
 const ROLE_TAG_STYLES = {
   Editor: "bg-orange/20 text-orange border-orange/40",
   Foreword: "bg-cream/15 text-cream border-cream/30",
-  "Chapter Author": "bg-white/10 text-muted border-white/15",
+  Contributor: "bg-white/10 text-muted border-white/15",
   Speaker: "bg-white/10 text-muted border-white/15",
 };
 
