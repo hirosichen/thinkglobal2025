@@ -4,24 +4,55 @@ import { openEventEndedModal } from "./EventEndedModal";
 
 const FEATURED = new Set(["Prof. Naoyuki Yoshino", "Prof. Hung-Yi Chen", "Prof. Nafis Alam"]);
 
-function buildAllContributors() {
-  const seen = new Set();
-  const out = [];
-  const push = (name, role) => {
-    if (!name || seen.has(name)) return;
-    seen.add(name);
-    out.push({ name, role });
-  };
-  speakers.forEach((s) => push(s.name, "Speaker"));
+// Build role-segmented contributor lists, deduplicated per role priority:
+// editor > foreword > chapter author > event-only speaker
+function buildRoleGroups() {
+  const editorsSet = new Set();
+  const forewordsSet = new Set();
+  const authorsSet = new Set();
   publications.forEach((p) => {
-    (p.forewords || []).forEach((n) => push(n, "Foreword"));
-    p.chapters.forEach((c) => c.authors.forEach((n) => push(n, "Author")));
+    (p.editors || []).forEach((n) => editorsSet.add(n));
+    (p.forewords || []).forEach((n) => forewordsSet.add(n));
+    p.chapters.forEach((c) => c.authors.forEach((n) => authorsSet.add(n)));
   });
-  return out;
+  // Match name strings: book "Hung-Yi Chen" vs speakers "Prof. Hung-Yi Chen"
+  const matchSpeaker = (n) =>
+    speakers.find((s) => s.name === n || s.name.endsWith(" " + n) || n.endsWith(s.name.replace(/^Prof\.\s+|^Dr\.\s+/, ""))) || null;
+
+  const editors = Array.from(editorsSet).map((n) => {
+    const sp = matchSpeaker(n);
+    return { name: sp ? sp.name : n };
+  });
+
+  const forewords = Array.from(forewordsSet)
+    .filter((n) => !editorsSet.has(n))
+    .map((n) => {
+      const sp = matchSpeaker(n);
+      return { name: sp ? sp.name : n };
+    });
+
+  const editorAndForewordNames = new Set([
+    ...Array.from(editorsSet),
+    ...Array.from(forewordsSet),
+  ]);
+  const chapters = Array.from(authorsSet)
+    .filter((n) => !editorAndForewordNames.has(n))
+    .map((n) => ({ name: n }));
+
+  // Event-only speakers (not in any book role)
+  const allBookNames = new Set([
+    ...editors.map((e) => e.name),
+    ...forewords.map((f) => f.name),
+    ...chapters.map((c) => c.name),
+  ]);
+  const eventOnly = speakers
+    .filter((s) => !allBookNames.has(s.name) && !FEATURED.has(s.name))
+    .map((s) => ({ name: s.name }));
+
+  return { editors, forewords, chapters, eventOnly };
 }
 
-const ALL_CONTRIBUTORS = buildAllContributors();
-const OTHER_CONTRIBUTORS = ALL_CONTRIBUTORS.filter((c) => !FEATURED.has(c.name));
+const ROLES = buildRoleGroups();
 
 function useCountdown(target) {
   const [diff, setDiff] = useState(() => target - Date.now());
@@ -113,50 +144,17 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Contributors wall — full lineup across speakers + book series */}
+        {/* Contributors — segmented by role */}
         <div
-          className="mt-10 md:mt-12 reveal"
+          className="mt-12 md:mt-16 reveal space-y-8 md:space-y-10"
           style={{ animationDelay: "450ms" }}
         >
-          <div className="flex items-center justify-center gap-3 mb-5">
-            <span className="h-px w-10 bg-orange/40" />
-            <p className="text-[10px] tracking-[0.28em] uppercase text-orange">
-              & {OTHER_CONTRIBUTORS.length} contributors across the series
-            </p>
-            <span className="h-px w-10 bg-orange/40" />
-          </div>
-          <div className="grid grid-cols-9 sm:grid-cols-9 md:grid-cols-9 gap-1 md:gap-1.5 max-w-2xl mx-auto">
-            {OTHER_CONTRIBUTORS.map((c, i) => {
-              const src = photos[c.name];
-              const aff = affiliations[c.name];
-              return (
-                <a
-                  key={c.name}
-                  href="#publications"
-                  title={`${c.name}${aff ? " — " + aff : ""}`}
-                  className="group relative aspect-square overflow-hidden rounded-md border border-white/10 bg-white/[0.04] hover:border-orange/50 hover:z-10 transition-all"
-                  style={{ animationDelay: `${i * 25}ms` }}
-                >
-                  {src ? (
-                    <img
-                      src={src}
-                      alt={c.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[10px] text-muted">
-                      {c.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 ring-1 ring-inset ring-black/20 pointer-events-none" />
-                </a>
-              );
-            })}
-          </div>
-          <p className="text-center text-[10px] tracking-[0.18em] uppercase text-muted mt-5">
-            Editors · Foreword Writers · Chapter Authors · Across 5 Continents
-          </p>
+          <ContributorRow label="Editors" count={ROLES.editors.length} items={ROLES.editors} variant="static" size={88} />
+          <ContributorRow label="Foreword Writers" count={ROLES.forewords.length} items={ROLES.forewords} variant="static" size={72} />
+          <ContributorRow label="Chapter Authors" count={ROLES.chapters.length} items={ROLES.chapters} variant="marquee" size={64} />
+          {ROLES.eventOnly.length > 0 && (
+            <ContributorRow label="Also on Stage" count={ROLES.eventOnly.length} items={ROLES.eventOnly} variant="static" size={64} />
+          )}
         </div>
 
         {/* Stats row */}
@@ -227,6 +225,76 @@ function CountdownPill({ cd }) {
       <span className="opacity-30">:</span>
       <CdNum n={cd.secs} label="sec" />
     </button>
+  );
+}
+
+function ContributorRow({ label, count, items, variant = "static", size = 64 }) {
+  const cards = items.map((c, i) => <ContribCard key={`${c.name}-${i}`} c={c} size={size} />);
+
+  return (
+    <section>
+      <div className="flex items-center justify-center gap-3 mb-5">
+        <span className="h-px w-8 bg-orange/40" />
+        <p className="text-[10px] tracking-[0.28em] uppercase text-orange">
+          {label} <span className="text-muted/70 ml-1">· {count}</span>
+        </p>
+        <span className="h-px w-8 bg-orange/40" />
+      </div>
+
+      {variant === "marquee" ? (
+        <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
+          <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4">
+            {[...cards, ...cards].map((card, i) => (
+              <div key={i}>{card}</div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 max-w-4xl mx-auto">
+          {cards}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ContribCard({ c, size }) {
+  const src = photos[c.name];
+  const aff = affiliations[c.name];
+  const cleanName = c.name.replace(/^Prof\.\s+|^Dr\.\s+/, "");
+  return (
+    <a
+      href="#publications"
+      title={aff || c.name}
+      className="group shrink-0 block"
+      style={{ width: size + 16 }}
+    >
+      <div
+        className="relative overflow-hidden rounded-lg border border-white/15 group-hover:border-orange/60 transition-colors bg-white/[0.04]"
+        style={{ width: size, height: size }}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={c.name}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs text-muted">
+            {c.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
+          </div>
+        )}
+      </div>
+      <div className="mt-2 text-center">
+        <div
+          className="font-display text-cream leading-tight"
+          style={{ fontSize: Math.max(11, size * 0.16) }}
+        >
+          {cleanName}
+        </div>
+      </div>
+    </a>
   );
 }
 
