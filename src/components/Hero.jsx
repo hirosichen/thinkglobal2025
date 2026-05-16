@@ -112,11 +112,32 @@ export default function Hero() {
           — eight global voices, one focused afternoon in Tokyo.
         </p>
 
-        {/* Book series stage — horizontal: text left, tilted books right, marquee behind */}
+        {/* Book series stage — marquee runs behind, books float in front */}
         <div
           className="mt-12 md:mt-16 reveal"
           style={{ animationDelay: "250ms" }}
         >
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3">
+              <span className="h-px w-10 bg-orange/40" />
+              <p className="text-[11px] tracking-[0.28em] uppercase text-orange font-semibold">
+                From the Global Perspectives book series
+              </p>
+              <span className="h-px w-10 bg-orange/40" />
+            </div>
+            <p className="text-xs text-muted italic mt-3">
+              {(() => {
+                const total =
+                  ROLES.editors.length +
+                  ROLES.forewords.length +
+                  ROLES.chapters.length +
+                  ROLES.eventOnly.length;
+                return `${total} voices · Editors · Foreword Writers · Contributors · Speakers`;
+              })()}
+            </p>
+          </div>
+
+          {/* Stage: marquee back layer + books front layer share the same space */}
           {(() => {
             const all = [
               ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
@@ -124,43 +145,26 @@ export default function Hero() {
               ...ROLES.chapters.map((c) => ({ ...c, role: "Contributor" })),
               ...ROLES.eventOnly.map((c) => ({ ...c, role: "Speaker" })),
             ];
-            const total = all.length;
             const minLoop = Math.max(all.length * 2, 24);
             const loop = [];
             while (loop.length < minLoop) loop.push(...all);
 
             return (
-              <div className="relative" style={{ minHeight: 220 }}>
-                {/* Marquee — back layer, full width, vertically centered */}
+              <div className="relative" style={{ minHeight: 280 }}>
+                {/* Marquee — back layer, vertically centered */}
                 <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-0">
                   <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
-                    <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4 opacity-75">
+                    <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4 opacity-80">
                       {loop.map((c, i) => (
-                        <ContribCard key={`${c.name}-${i}`} c={c} size={64} showRole />
+                        <ContribCard key={`${c.name}-${i}`} c={c} size={72} showRole />
                       ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Foreground: text-left + books-right */}
-                <div className="relative z-10 grid grid-cols-1 md:grid-cols-[1fr_auto] items-center gap-6 md:gap-12 max-w-4xl mx-auto">
-                  {/* Left — header text, right-aligned on desktop */}
-                  <div className="text-center md:text-right">
-                    <div className="inline-block bg-ink/85 backdrop-blur-sm px-4 py-3 rounded-lg">
-                      <div className="flex items-center justify-center md:justify-end gap-3">
-                        <span className="h-px w-8 bg-orange/40" />
-                        <p className="text-[10px] md:text-[11px] tracking-[0.24em] uppercase text-orange font-semibold">
-                          From the Global Perspectives book series
-                        </p>
-                      </div>
-                      <p className="text-[11px] md:text-xs text-muted italic mt-2">
-                        {total} voices · Editors · Foreword Writers · Contributors · Speakers
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Right — tilted overlapping books */}
-                  <div className="flex justify-center md:justify-start items-center">
+                {/* Books — tilted overlapping pair, compact centerpiece */}
+                <div className="relative z-10 flex justify-center items-center h-full pointer-events-none">
+                  <div className="flex items-center pointer-events-auto">
                     {publications.map((p, i) => {
                       const isFirst = i === 0;
                       return (
@@ -170,16 +174,16 @@ export default function Hero() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group relative block"
-                          title={`${p.title} — ${p.subtitle}`}
                           style={{
-                            transform: `rotate(${isFirst ? -12 : 12}deg)`,
-                            marginRight: isFirst ? "-32px" : 0,
-                            marginLeft: !isFirst ? "-32px" : 0,
+                            transform: `rotate(${isFirst ? -10 : 10}deg)`,
+                            marginRight: isFirst ? "-28px" : 0,
+                            marginLeft: !isFirst ? "-28px" : 0,
                             zIndex: isFirst ? 11 : 12,
                           }}
                         >
+                          {/* tight halo to fade marquee directly behind book */}
                           <div className="absolute -inset-3 bg-ink/60 blur-xl rounded-xl" aria-hidden />
-                          <div className="relative w-[88px] md:w-[110px] aspect-[3/4] overflow-hidden rounded-md border-2 border-white/25 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.9)] ring-1 ring-black/50 group-hover:border-orange/70 group-hover:scale-[1.05] transition-all duration-500">
+                          <div className="relative w-[100px] md:w-[120px] aspect-[3/4] overflow-hidden rounded-md border-2 border-white/25 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.9)] ring-1 ring-black/50 group-hover:border-orange/70 group-hover:scale-[1.04] transition-all duration-500">
                             <img
                               src={p.img}
                               alt={p.title}
@@ -193,6 +197,29 @@ export default function Hero() {
                       );
                     })}
                   </div>
+                </div>
+
+                {/* Book captions — below stage, away from marquee */}
+                <div className="relative z-10 mt-3 flex justify-center gap-10 md:gap-20 text-center">
+                  {publications.map((p) => (
+                    <a
+                      key={p.title + "-caption"}
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group w-[120px] md:w-[140px]"
+                    >
+                      <div className="font-display text-xs md:text-sm text-cream leading-tight">
+                        {p.title}
+                      </div>
+                      <div className="text-[9px] md:text-[10px] text-muted italic mt-0.5 leading-snug">
+                        {p.subtitle}
+                      </div>
+                      <div className="text-[9px] tracking-[0.16em] uppercase text-orange/70 mt-1 group-hover:text-orange transition-colors">
+                        Palgrave Macmillan ↗
+                      </div>
+                    </a>
+                  ))}
                 </div>
               </div>
             );
