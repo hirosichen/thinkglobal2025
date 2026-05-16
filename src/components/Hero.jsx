@@ -112,56 +112,32 @@ export default function Hero() {
           — eight global voices, one focused afternoon in Tokyo.
         </p>
 
-        {/* From the book series — prominent two-book showcase */}
+        {/* Book series stage — marquee runs behind, books float in front */}
         <div
           className="mt-12 md:mt-16 reveal"
           style={{ animationDelay: "250ms" }}
         >
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <span className="h-px w-10 bg-orange/40" />
-            <p className="text-[11px] tracking-[0.28em] uppercase text-orange font-semibold">
-              From the Global Perspectives book series
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3">
+              <span className="h-px w-10 bg-orange/40" />
+              <p className="text-[11px] tracking-[0.28em] uppercase text-orange font-semibold">
+                From the Global Perspectives book series
+              </p>
+              <span className="h-px w-10 bg-orange/40" />
+            </div>
+            <p className="text-xs text-muted italic mt-3">
+              {(() => {
+                const total =
+                  ROLES.editors.length +
+                  ROLES.forewords.length +
+                  ROLES.chapters.length +
+                  ROLES.eventOnly.length;
+                return `${total} voices · Editors · Foreword Writers · Contributors · Speakers`;
+              })()}
             </p>
-            <span className="h-px w-10 bg-orange/40" />
           </div>
-          <div className="flex flex-wrap justify-center gap-10 md:gap-16">
-            {publications.map((p) => (
-              <a
-                key={p.title}
-                href={p.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col items-center text-center w-[130px] md:w-[150px]"
-              >
-                <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-white/15 group-hover:border-orange/60 transition-colors shadow-2xl shadow-black/40">
-                  <img
-                    src={p.img}
-                    alt={p.title}
-                    className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
-                  />
-                  <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[8px] tracking-[0.18em] uppercase font-bold bg-orange text-ink rounded-sm">
-                    {p.year}
-                  </span>
-                </div>
-                <div className="mt-3 font-display text-sm md:text-base text-cream leading-tight">
-                  {p.title}
-                </div>
-                <div className="text-[10px] md:text-xs text-muted italic mt-1 leading-snug">
-                  {p.subtitle}
-                </div>
-                <div className="text-[9px] tracking-[0.16em] uppercase text-orange/80 mt-1.5 group-hover:text-orange transition-colors">
-                  Palgrave Macmillan ↗
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
 
-        {/* Contributors — single unified marquee with role tags */}
-        <div
-          className="mt-14 md:mt-20 reveal"
-          style={{ animationDelay: "350ms" }}
-        >
+          {/* Stage: marquee back layer + books front layer share the same space */}
           {(() => {
             const all = [
               ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
@@ -169,15 +145,63 @@ export default function Hero() {
               ...ROLES.chapters.map((c) => ({ ...c, role: "Contributor" })),
               ...ROLES.eventOnly.map((c) => ({ ...c, role: "Speaker" })),
             ];
+            const minLoop = Math.max(all.length * 2, 24);
+            const loop = [];
+            while (loop.length < minLoop) loop.push(...all);
+
             return (
-              <ContributorRow
-                label="The full lineup"
-                sub="Editors · Foreword Writers · Contributors · Speakers"
-                count={all.length}
-                items={all}
-                tier="primary"
-                showRole
-              />
+              <div className="relative" style={{ minHeight: 280 }}>
+                {/* Marquee — back layer, vertically centered */}
+                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-0">
+                  <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
+                    <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4 opacity-80">
+                      {loop.map((c, i) => (
+                        <ContribCard key={`${c.name}-${i}`} c={c} size={72} showRole />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Books — front layer, centered above the marquee */}
+                <div className="relative z-10 flex justify-center gap-10 md:gap-20 pt-2">
+                  {publications.map((p) => (
+                    <a
+                      key={p.title}
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex flex-col items-center text-center w-[130px] md:w-[150px]"
+                    >
+                      <div className="relative">
+                        {/* Soft halo behind book so marquee fades */}
+                        <div className="absolute -inset-6 bg-ink/70 blur-2xl rounded-full" aria-hidden />
+                        <div className="absolute -inset-2 bg-gradient-radial from-ink/80 to-transparent rounded-xl" aria-hidden />
+                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-white/20 group-hover:border-orange/60 transition-colors shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-black/40">
+                          <img
+                            src={p.img}
+                            alt={p.title}
+                            className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
+                          />
+                          <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[8px] tracking-[0.18em] uppercase font-bold bg-orange text-ink rounded-sm">
+                            {p.year}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="relative mt-3 inline-block px-3 py-1 rounded-md bg-ink/85 backdrop-blur-sm">
+                        <div className="font-display text-sm md:text-base text-cream leading-tight">
+                          {p.title}
+                        </div>
+                        <div className="text-[10px] md:text-xs text-muted italic mt-0.5 leading-snug">
+                          {p.subtitle}
+                        </div>
+                        <div className="text-[9px] tracking-[0.16em] uppercase text-orange/80 mt-1 group-hover:text-orange transition-colors">
+                          Palgrave Macmillan ↗
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
             );
           })()}
         </div>
