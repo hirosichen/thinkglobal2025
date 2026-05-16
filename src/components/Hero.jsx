@@ -162,41 +162,61 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Books — front layer, centered above the marquee */}
-                <div className="relative z-10 flex justify-center gap-10 md:gap-20 pt-2">
+                {/* Books — tilted overlapping pair, compact centerpiece */}
+                <div className="relative z-10 flex justify-center items-center h-full pointer-events-none">
+                  <div className="flex items-center pointer-events-auto">
+                    {publications.map((p, i) => {
+                      const isFirst = i === 0;
+                      return (
+                        <a
+                          key={p.title}
+                          href={p.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative block"
+                          style={{
+                            transform: `rotate(${isFirst ? -10 : 10}deg)`,
+                            marginRight: isFirst ? "-28px" : 0,
+                            marginLeft: !isFirst ? "-28px" : 0,
+                            zIndex: isFirst ? 11 : 12,
+                          }}
+                        >
+                          {/* tight halo to fade marquee directly behind book */}
+                          <div className="absolute -inset-3 bg-ink/60 blur-xl rounded-xl" aria-hidden />
+                          <div className="relative w-[100px] md:w-[120px] aspect-[3/4] overflow-hidden rounded-md border-2 border-white/25 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.9)] ring-1 ring-black/50 group-hover:border-orange/70 group-hover:scale-[1.04] transition-all duration-500">
+                            <img
+                              src={p.img}
+                              alt={p.title}
+                              className="w-full h-full object-cover"
+                            />
+                            <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[8px] tracking-[0.18em] uppercase font-bold bg-orange text-ink rounded-sm">
+                              {p.year}
+                            </span>
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Book captions — below stage, away from marquee */}
+                <div className="relative z-10 mt-3 flex justify-center gap-10 md:gap-20 text-center">
                   {publications.map((p) => (
                     <a
-                      key={p.title}
+                      key={p.title + "-caption"}
                       href={p.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex flex-col items-center text-center w-[130px] md:w-[150px]"
+                      className="group w-[120px] md:w-[140px]"
                     >
-                      <div className="relative">
-                        {/* Soft halo behind book so marquee fades */}
-                        <div className="absolute -inset-6 bg-ink/70 blur-2xl rounded-full" aria-hidden />
-                        <div className="absolute -inset-2 bg-gradient-radial from-ink/80 to-transparent rounded-xl" aria-hidden />
-                        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-white/20 group-hover:border-orange/60 transition-colors shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-black/40">
-                          <img
-                            src={p.img}
-                            alt={p.title}
-                            className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
-                          />
-                          <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[8px] tracking-[0.18em] uppercase font-bold bg-orange text-ink rounded-sm">
-                            {p.year}
-                          </span>
-                        </div>
+                      <div className="font-display text-xs md:text-sm text-cream leading-tight">
+                        {p.title}
                       </div>
-                      <div className="relative mt-3 inline-block px-3 py-1 rounded-md bg-ink/85 backdrop-blur-sm">
-                        <div className="font-display text-sm md:text-base text-cream leading-tight">
-                          {p.title}
-                        </div>
-                        <div className="text-[10px] md:text-xs text-muted italic mt-0.5 leading-snug">
-                          {p.subtitle}
-                        </div>
-                        <div className="text-[9px] tracking-[0.16em] uppercase text-orange/80 mt-1 group-hover:text-orange transition-colors">
-                          Palgrave Macmillan ↗
-                        </div>
+                      <div className="text-[9px] md:text-[10px] text-muted italic mt-0.5 leading-snug">
+                        {p.subtitle}
+                      </div>
+                      <div className="text-[9px] tracking-[0.16em] uppercase text-orange/70 mt-1 group-hover:text-orange transition-colors">
+                        Palgrave Macmillan ↗
                       </div>
                     </a>
                   ))}
