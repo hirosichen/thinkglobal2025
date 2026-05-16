@@ -124,30 +124,32 @@ export default function Hero() {
             </p>
             <span className="h-px w-10 bg-orange/40" />
           </div>
-          <div className="grid grid-cols-2 gap-5 md:gap-10 max-w-3xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-10 md:gap-16">
             {publications.map((p) => (
               <a
                 key={p.title}
                 href={p.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col items-center text-center"
+                className="group flex flex-col items-center text-center w-[130px] md:w-[150px]"
               >
-                <div className="relative w-full aspect-[3/4] max-w-[200px] overflow-hidden rounded-lg border-2 border-white/15 group-hover:border-orange/60 transition-colors shadow-2xl shadow-black/40">
+                <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg border-2 border-white/15 group-hover:border-orange/60 transition-colors shadow-2xl shadow-black/40">
                   <img
                     src={p.img}
                     alt={p.title}
                     className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
                   />
-                  <span className="absolute top-2 left-2 px-2 py-1 text-[9px] tracking-[0.18em] uppercase font-bold bg-orange text-ink rounded">
+                  <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[8px] tracking-[0.18em] uppercase font-bold bg-orange text-ink rounded-sm">
                     {p.year}
                   </span>
                 </div>
-                <div className="mt-4 font-display text-lg md:text-xl text-cream leading-tight">
+                <div className="mt-3 font-display text-sm md:text-base text-cream leading-tight">
                   {p.title}
                 </div>
-                <div className="text-xs md:text-sm text-muted italic mt-1">{p.subtitle}</div>
-                <div className="text-[10px] tracking-[0.16em] uppercase text-orange/80 mt-2 group-hover:text-orange transition-colors">
+                <div className="text-[10px] md:text-xs text-muted italic mt-1 leading-snug">
+                  {p.subtitle}
+                </div>
+                <div className="text-[9px] tracking-[0.16em] uppercase text-orange/80 mt-1.5 group-hover:text-orange transition-colors">
                   Palgrave Macmillan ↗
                 </div>
               </a>
