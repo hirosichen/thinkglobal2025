@@ -112,41 +112,29 @@ export default function Hero() {
           — eight global voices, one focused afternoon in Tokyo.
         </p>
 
-        {/* Contributors — segmented by role, no duplication */}
+        {/* Contributors — single unified marquee with role tags */}
         <div
-          className="mt-14 md:mt-20 reveal space-y-12 md:space-y-16"
+          className="mt-14 md:mt-20 reveal"
           style={{ animationDelay: "350ms" }}
         >
-          <ContributorRow
-            label="Editors"
-            sub="Of the Global Perspectives book series"
-            count={ROLES.editors.length}
-            items={ROLES.editors}
-            tier="spotlight"
-          />
-          <ContributorRow
-            label="Foreword Writers"
-            sub="Distinguished scholars who framed the volumes"
-            count={ROLES.forewords.length}
-            items={ROLES.forewords}
-            tier="primary"
-          />
-          <ContributorRow
-            label="Chapter Authors"
-            sub="Across academia, central banking, finance & law"
-            count={ROLES.chapters.length}
-            items={ROLES.chapters}
-            tier="marquee"
-          />
-          {ROLES.eventOnly.length > 0 && (
-            <ContributorRow
-              label="Also on Stage"
-              sub="Conference speakers"
-              count={ROLES.eventOnly.length}
-              items={ROLES.eventOnly}
-              tier="secondary"
-            />
-          )}
+          {(() => {
+            const all = [
+              ...ROLES.editors.map((c) => ({ ...c, role: "Editor" })),
+              ...ROLES.forewords.map((c) => ({ ...c, role: "Foreword" })),
+              ...ROLES.chapters.map((c) => ({ ...c, role: "Chapter Author" })),
+              ...ROLES.eventOnly.map((c) => ({ ...c, role: "Speaker" })),
+            ];
+            return (
+              <ContributorRow
+                label="The full lineup"
+                sub="Editors · Foreword Writers · Chapter Authors · Speakers"
+                count={all.length}
+                items={all}
+                tier="primary"
+                showRole
+              />
+            );
+          })()}
         </div>
 
         {/* Stats row */}
@@ -227,7 +215,7 @@ const TIER_SIZES = {
   secondary: 64,
 };
 
-function ContributorRow({ label, sub, count, items, tier = "marquee" }) {
+function ContributorRow({ label, sub, count, items, tier = "marquee", showRole = false }) {
   const size = TIER_SIZES[tier] || 72;
   // If list is shorter than ~6, duplicate enough to fill the marquee track for smooth scroll
   const minLoop = Math.max(items.length * 2, 12);
@@ -252,7 +240,7 @@ function ContributorRow({ label, sub, count, items, tier = "marquee" }) {
       <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
         <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4">
           {loop.map((c, i) => (
-            <ContribCard key={`${c.name}-${i}`} c={c} size={size} />
+            <ContribCard key={`${c.name}-${i}`} c={c} size={size} showRole={showRole} />
           ))}
         </div>
       </div>
@@ -260,10 +248,18 @@ function ContributorRow({ label, sub, count, items, tier = "marquee" }) {
   );
 }
 
-function ContribCard({ c, size }) {
+const ROLE_TAG_STYLES = {
+  Editor: "bg-orange/20 text-orange border-orange/40",
+  Foreword: "bg-cream/15 text-cream border-cream/30",
+  "Chapter Author": "bg-white/10 text-muted border-white/15",
+  Speaker: "bg-white/10 text-muted border-white/15",
+};
+
+function ContribCard({ c, size, showRole = false }) {
   const src = photos[c.name];
   const aff = affiliations[c.name];
   const cleanName = c.name.replace(/^Prof\.\s+|^Dr\.\s+/, "");
+  const roleTagClass = ROLE_TAG_STYLES[c.role] || "bg-white/10 text-muted border-white/15";
   return (
     <a
       href="#publications"
@@ -286,6 +282,13 @@ function ContribCard({ c, size }) {
           <div className="w-full h-full flex items-center justify-center text-xs text-muted">
             {c.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
           </div>
+        )}
+        {showRole && c.role && (
+          <span
+            className={`absolute bottom-1 left-1 right-1 text-center px-1 py-0.5 text-[8px] tracking-[0.14em] uppercase font-semibold rounded-sm border backdrop-blur-sm ${roleTagClass}`}
+          >
+            {c.role}
+          </span>
         )}
       </div>
       <div className="mt-2 text-center">
