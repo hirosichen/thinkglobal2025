@@ -112,48 +112,40 @@ export default function Hero() {
           — eight global voices, one focused afternoon in Tokyo.
         </p>
 
-        {/* Featured headliners */}
+        {/* Contributors — segmented by role, no duplication */}
         <div
-          className="mt-14 md:mt-16 reveal"
+          className="mt-14 md:mt-20 reveal space-y-12 md:space-y-16"
           style={{ animationDelay: "350ms" }}
         >
-          <p className="text-[11px] tracking-[0.28em] uppercase text-orange mb-5">
-            Featuring
-          </p>
-          <div className="grid sm:grid-cols-3 gap-4 md:gap-5 max-w-5xl mx-auto items-stretch">
-            <FeaturedCard
-              img="/img/speakers/nyoshino.jpg"
-              name="Prof. Naoyuki Yoshino"
-              title="Former Dean,"
-              titleLine2="Asian Development Bank Institute"
-              org="Professor Emeritus, Keio University"
-            />
-            <FeaturedCard
-              img="/img/speakers/hychen.jpg"
-              name="Prof. Hung-Yi Chen"
-              title="Founder,"
-              titleLine2="Meta Intelligence"
-              org="Former MBA Director & Professor, Zhejiang University"
-            />
-            <FeaturedCard
-              img="/img/speakers/nalam.jpg"
-              name="Prof. Nafis Alam"
-              title="Head of School of Business,"
-              titleLine2="Monash University Malaysia"
-            />
-          </div>
-        </div>
-
-        {/* Contributors — segmented by role */}
-        <div
-          className="mt-12 md:mt-16 reveal space-y-8 md:space-y-10"
-          style={{ animationDelay: "450ms" }}
-        >
-          <ContributorRow label="Editors" count={ROLES.editors.length} items={ROLES.editors} variant="static" size={88} />
-          <ContributorRow label="Foreword Writers" count={ROLES.forewords.length} items={ROLES.forewords} variant="static" size={72} />
-          <ContributorRow label="Chapter Authors" count={ROLES.chapters.length} items={ROLES.chapters} variant="marquee" size={64} />
+          <ContributorRow
+            label="Editors"
+            sub="Of the Global Perspectives book series"
+            count={ROLES.editors.length}
+            items={ROLES.editors}
+            tier="spotlight"
+          />
+          <ContributorRow
+            label="Foreword Writers"
+            sub="Distinguished scholars who framed the volumes"
+            count={ROLES.forewords.length}
+            items={ROLES.forewords}
+            tier="primary"
+          />
+          <ContributorRow
+            label="Chapter Authors"
+            sub="Across academia, central banking, finance & law"
+            count={ROLES.chapters.length}
+            items={ROLES.chapters}
+            tier="marquee"
+          />
           {ROLES.eventOnly.length > 0 && (
-            <ContributorRow label="Also on Stage" count={ROLES.eventOnly.length} items={ROLES.eventOnly} variant="static" size={64} />
+            <ContributorRow
+              label="Also on Stage"
+              sub="Conference speakers"
+              count={ROLES.eventOnly.length}
+              items={ROLES.eventOnly}
+              tier="secondary"
+            />
           )}
         </div>
 
@@ -228,32 +220,42 @@ function CountdownPill({ cd }) {
   );
 }
 
-function ContributorRow({ label, count, items, variant = "static", size = 64 }) {
-  const cards = items.map((c, i) => <ContribCard key={`${c.name}-${i}`} c={c} size={size} />);
+const TIER_SIZES = {
+  spotlight: 104,
+  primary: 84,
+  marquee: 72,
+  secondary: 64,
+};
+
+function ContributorRow({ label, sub, count, items, tier = "marquee" }) {
+  const size = TIER_SIZES[tier] || 72;
+  // If list is shorter than ~6, duplicate enough to fill the marquee track for smooth scroll
+  const minLoop = Math.max(items.length * 2, 12);
+  const loop = [];
+  while (loop.length < minLoop) loop.push(...items);
 
   return (
     <section>
-      <div className="flex items-center justify-center gap-3 mb-5">
-        <span className="h-px w-8 bg-orange/40" />
-        <p className="text-[10px] tracking-[0.28em] uppercase text-orange">
-          {label} <span className="text-muted/70 ml-1">· {count}</span>
-        </p>
-        <span className="h-px w-8 bg-orange/40" />
+      <div className="text-center mb-5">
+        <div className="flex items-center justify-center gap-3">
+          <span className="h-px w-8 bg-orange/40" />
+          <p className="text-[10px] tracking-[0.28em] uppercase text-orange">
+            {label} <span className="text-muted/70 ml-1">· {count}</span>
+          </p>
+          <span className="h-px w-8 bg-orange/40" />
+        </div>
+        {sub && (
+          <p className="text-xs text-muted mt-2 italic">{sub}</p>
+        )}
       </div>
 
-      {variant === "marquee" ? (
-        <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
-          <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4">
-            {[...cards, ...cards].map((card, i) => (
-              <div key={i}>{card}</div>
-            ))}
-          </div>
+      <div className="relative overflow-hidden -mx-6 md:-mx-10 [mask-image:linear-gradient(90deg,transparent_0,#000_6%,#000_94%,transparent_100%)]">
+        <div className="flex gap-3 md:gap-4 animate-marquee hover:[animation-play-state:paused] w-max px-4">
+          {loop.map((c, i) => (
+            <ContribCard key={`${c.name}-${i}`} c={c} size={size} />
+          ))}
         </div>
-      ) : (
-        <div className="flex flex-wrap justify-center gap-3 md:gap-4 max-w-4xl mx-auto">
-          {cards}
-        </div>
-      )}
+      </div>
     </section>
   );
 }
