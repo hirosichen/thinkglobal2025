@@ -206,6 +206,14 @@ export const photos = {
   "Hung-Yi Chen": "/img/speakers/hychen.jpg",
   "Pawee Jenweeranon": "/img/speakers/paweejen.jpg",
   "Nafis Alam": "/img/speakers/nalam.jpg",
+  // Other speakers
+  "Prof. Matsuura Yoshiharu": "/img/speakers/myoshi.png",
+  "Prof. Hung-Yi Chen": "/img/speakers/hychen.jpg",
+  "Prof. Nafis Alam": "/img/speakers/nalam.jpg",
+  "Prof. Naoyuki Yoshino": "/img/speakers/nyoshino.jpg",
+  "Prof. Jonathan Lin": "/img/speakers/jlin.jpg",
+  "Takafumi Ochiai": "/img/speakers/tochiai.jpg",
+  "Takashi Nakazaki": "/img/speakers/tnakazaki.jpg",
   // Foreword writers
   "Naoyuki Yoshino": "/img/speakers/nyoshino.jpg",
   "Bryan Zheng Zhang": "/img/contributors/bryan-zhang.jpg",
